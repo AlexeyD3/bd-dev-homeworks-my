@@ -53,22 +53,31 @@ test_db=# select datname from pg_catalog.pg_database;
 - описание таблиц (describe);
 
 ```
-test_db=# SELECT                                      
-   table_catalog, table_name, column_name, data_type 
-FROM 
-   information_schema.columns
-WHERE 
-   table_name in ('orders', 'clients');
- table_catalog | table_name |    column_name    |     data_type     
----------------+------------+-------------------+-------------------
- test_db       | orders     | id                | integer
- test_db       | orders     | наименование      | character varying
- test_db       | orders     | цена              | integer
- test_db       | clients    | id                | integer
- test_db       | clients    | фамилия           | character varying
- test_db       | clients    | страна проживания | character varying
- test_db       | clients    | заказ             | integer
-(7 rows)
+test_db=# \d clients
+                                         Table "public.clients"
+      Column       |          Type          | Collation | Nullable |               Default               
+-------------------+------------------------+-----------+----------+-------------------------------------
+ id                | integer                |           | not null | nextval('clients_id_seq'::regclass)
+ фамилия           | character varying(200) |           | not null | 
+ страна проживания | character varying(200) |           | not null | 
+ заказ             | integer                |           |          | 
+Indexes:
+    "clients_pkey" PRIMARY KEY, btree (id)
+Foreign-key constraints:
+    "clients_заказ_fkey" FOREIGN KEY ("заказ") REFERENCES orders(id)
+```
+```
+test_db=# \d orders
+                                       Table "public.orders"
+    Column    |          Type          | Collation | Nullable |              Default               
+--------------+------------------------+-----------+----------+------------------------------------
+ id           | integer                |           | not null | nextval('orders_id_seq'::regclass)
+ наименование | character varying(200) |           | not null | 
+ цена         | integer                |           | not null | 
+Indexes:
+    "orders_pkey" PRIMARY KEY, btree (id)
+Referenced by:
+    TABLE "clients" CONSTRAINT "clients_заказ_fkey" FOREIGN KEY ("заказ") REFERENCES orders(id)
 ```
 
 - SQL-запрос для выдачи списка пользователей с правами над таблицами test_db;
