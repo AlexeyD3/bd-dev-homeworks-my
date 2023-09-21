@@ -244,11 +244,27 @@ test_db=# EXPLAIN ANALYZE SELECT * FROM clients WHERE заказ IS NOT NULL;
 
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. задачу 1).
 
+```bash
+docker exec -t postgres pg_dump --no-owner -U admin-user test_db > ./backup/test_db_backup.sql
+```
+
 Остановите контейнер с PostgreSQL, но не удаляйте volumes.
+
+```bash
+docker stop postgres
+```
 
 Поднимите новый пустой контейнер с PostgreSQL.
 
+```bash
+
+```
+
 Восстановите БД test_db в новом контейнере.
+
+```bash
+psql -U admin-user -d test_db -f /backup/test_db_backup.dump
+```
 
 Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
 
