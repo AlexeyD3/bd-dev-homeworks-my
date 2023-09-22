@@ -12,6 +12,74 @@
 
 Приведите получившуюся команду или docker-compose-манифест.
 
+```bash
+version: "3.9"
+services:
+  postgres:
+    container_name: postgres
+    image: postgres:13.3
+    restart: always
+    environment:
+      POSTGRES_DB: "test_db"
+      POSTGRES_USER: "admin-user"
+      POSTGRES_PASSWORD: "2Netology"
+      PGDATA: "/var/lib/postgresql/pgdata"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "./docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d"
+      - "./test_db-data:/var/lib/postgresql/pgdata"
+      - "./backup:/backup"
+```
+
+Файл action.sql в docker-entrypoint-initdb.d с учётом последующих заданий:
+
+~~~~sql
+CREATE ROLE "test-admin-user" LOGIN PASSWORD '2Netology';
+
+CREATE ROLE "test-simple-user" LOGIN PASSWORD '2Netology';
+
+CREATE TABLE IF NOT EXISTS orders (
+    "id"                 serial PRIMARY KEY,
+    "наименование"       VARCHAR(200) NOT NULL,
+    "цена"               INTEGER NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS clients (
+    "id"                 serial PRIMARY KEY,
+    "фамилия"            VARCHAR(200) NOT NULL,
+    "страна проживания"  VARCHAR(200) NOT NULL,
+    "заказ"              INTEGER,
+    FOREIGN KEY (заказ) REFERENCES orders (id)
+);
+
+GRANT ALL ON orders, clients TO "test-admin-user";
+
+GRANT SELECT, INSERT, UPDATE, DELETE ON TABLE orders, clients TO "test-simple-user";
+
+INSERT INTO
+    orders (наименование, цена)
+VALUES
+    ('Шоколад',	'10'),
+    ('Принтер',	'3000'),
+    ('Книга',	'500'),
+    ('Монитор',	'7000'),
+    ('Гитара',	'4000');
+
+INSERT INTO
+    clients (фамилия, "страна проживания")
+VALUES
+    ('Иванов Иван Иванович', 'USA'),
+    ('Петров Петр Петрович', 'Canada'),
+    ('Иоганн Себастьян Бах', 'Japan'),
+    ('Ронни Джеймс Дио',     'Russia'),
+    ('Ritchie Blackmore',    'Russia');
+
+UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Книга') WHERE "фамилия"='Иванов Иван Иванович';
+UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Монитор') WHERE "фамилия"='Петров Петр Петрович';
+UPDATE clients SET "заказ" = (SELECT id FROM orders WHERE "наименование"='Гитара') WHERE "фамилия"='Иоганн Себастьян Бах';
+~~~~
+
 ## Задача 2
 
 В БД из задачи 1: 
