@@ -40,16 +40,19 @@
 - итоговый список БД после выполнения пунктов выше;
 
 ```
-test_db=# select datname from pg_catalog.pg_database; 
-  datname  
------------
- postgres
- test_db
- template1
- template0
+test_db=# \l
+                                      List of databases
+   Name    |   Owner    | Encoding |  Collate   |   Ctype    |       Access privileges       
+-----------+------------+----------+------------+------------+-------------------------------
+ postgres  | admin-user | UTF8     | en_US.utf8 | en_US.utf8 | 
+ template0 | admin-user | UTF8     | en_US.utf8 | en_US.utf8 | =c/"admin-user"              +
+           |            |          |            |            | "admin-user"=CTc/"admin-user"
+ template1 | admin-user | UTF8     | en_US.utf8 | en_US.utf8 | =c/"admin-user"              +
+           |            |          |            |            | "admin-user"=CTc/"admin-user"
+ test_db   | admin-user | UTF8     | en_US.utf8 | en_US.utf8 | 
 (4 rows)
-
 ```
+
 - описание таблиц (describe);
 
 ```
