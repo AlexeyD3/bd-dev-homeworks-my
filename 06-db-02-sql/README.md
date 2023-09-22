@@ -248,25 +248,30 @@ test_db=# EXPLAIN ANALYZE SELECT * FROM clients WHERE заказ IS NOT NULL;
 Создайте бэкап БД test_db и поместите его в volume, предназначенный для бэкапов (см. задачу 1).
 
 ```bash
-docker exec -t postgres pg_dump --no-owner -U admin-user test_db > ./backup/test_db_backup.sql
+wolin@wolinubuntu:~/netology/06-db-02-sql$ docker exec -it postgres bash
+
+root@6d11af5b8868:/# pg_dump -U admin-user -Fc test_db > ./backup/1test_db_backup.psql
+root@6d11af5b8868:/# exit
 ```
 
 Остановите контейнер с PostgreSQL, но не удаляйте volumes.
 
 ```bash
-docker stop postgres
+ wolin@wolinubuntu:~/netology/06-db-02-sql$ docker stop postgres
 ```
 
 Поднимите новый пустой контейнер с PostgreSQL.
 
 ```bash
-
+wolin@wolinubuntu:~/netology/06-db-02-sql$ docker run --rm -d -e POSTGRES_USER=admin-user -e POSTGRES_PASSWORD=2Netology -e POSTGRES_DB=test_db -v ./backup:/backup --name postgres2 postgres:13.3
 ```
 
 Восстановите БД test_db в новом контейнере.
 
 ```bash
-psql -U admin-user -d test_db -f /backup/test_db_backup.dump
+wolin@wolinubuntu:~/netology/06-db-02-sql$ docker exec -it postgres2 bash
+
+root@119a68dc6b92:/# pg_restore -O -U admin-user -d test_db /backup/1test_db_backup.psql
 ```
 
 Приведите список операций, который вы применяли для бэкапа данных и восстановления. 
