@@ -9,6 +9,35 @@
 
 Используя Docker, поднимите инстанс MySQL (версию 8). Данные БД сохраните в volume.
 
+> Docker-compose файл:
+
+<details>
+<summary>спойлер</summary>
+
+```
+version: "3.9"
+services:
+  mysql:
+    container_name: mysql
+    image: mysql:8.0
+    restart: always
+    tty: true
+    environment:
+      MYSQL_DATABASE: "test_db"
+      MYSQL_ROOT_PASSWORD: "2Netology"
+    ports:
+      - "3306:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ".logs:/var/log/mysql"
+      - "./mysql.cnf/:/etc/mysql.cnf"
+      - "./backup:/backup"
+volumes:
+  dbdata:
+    driver: local
+```
+</details>
+
 Изучите [бэкап БД](https://github.com/netology-code/virt-homeworks/tree/virt-11/06-db-03-mysql/test_data) и 
 восстановитесь из него.
 
@@ -110,9 +139,49 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
 
 Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
 
+<details>
+<summary>ENGINE=InnoDB (спойлер с выводом)</summary>
+
+```
+mysql> SHOW CREATE TABLE orders\G;
+*************************** 1. row ***************************
+       Table: orders
+Create Table: CREATE TABLE `orders` (
+  `id` int unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(80) NOT NULL,
+  `price` int DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci
+1 row in set (0.00 sec)
+```
+</details>
+
 Измените `engine` и **приведите время выполнения и запрос на изменения из профайлера в ответе**:
 - на `MyISAM`,
 - на `InnoDB`.
+
+```
+mysql> SET @@profiling = 1;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> ALTER TABLE orders ENGINE = MyISAM;
+Query OK, 5 rows affected (0.05 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> ALTER TABLE orders ENGINE = InnoDB;
+Query OK, 5 rows affected (0.07 sec)
+Records: 5  Duplicates: 0  Warnings: 0
+
+mysql> SHOW PROFILES;
++----------+------------+------------------------------------+
+| Query_ID | Duration   | Query                              |
++----------+------------+------------------------------------+
+|       19 | 0.04230900 | ALTER TABLE orders ENGINE = MyISAM |
+|       20 | 0.07169550 | ALTER TABLE orders ENGINE = InnoDB |
++----------+------------+------------------------------------+
+2 rows in set, 1 warning (0.00 sec)
+
+```
 
 ## Задача 4 
 
@@ -128,6 +197,24 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
 
 Приведите в ответе изменённый файл `my.cnf`.
 
+```
+[mysqld]
+datadir=/var/lib/mysql
+socket=/var/lib/mysql/mysql.sock
+
+bind-address=0.0.0.0
+server-id=1
+log_bin=/var/log/mysql/mybin.log
+
+log-error=/var/log/mysqld.log
+pid-file=/var/run/mysqld/mysqld.pid
+
+innodb_flush_log_at_trx_commit = 0  # скорость IO важнее сохранности данных;
+innodb_file_per_table = ON          # нужна компрессия таблиц для экономии места на диске;
+innodb_log_buffer_size = 1M         # размер буффера с незакомиченными транзакциями 1 Мб;
+innodb_buffer_pool_size = 2G        # буффер кеширования 30% от ОЗУ;
+innodb_log_file_size = 100M         # размер файла логов операций 100 Мб.
+```
 ---
 
 ### Как оформить ДЗ
