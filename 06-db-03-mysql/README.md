@@ -67,6 +67,42 @@ mysql> SELECT COUNT(price) FROM orders WHERE price NOT BETWEEN 0 and 300;
 Используя таблицу INFORMATION_SCHEMA.USER_ATTRIBUTES, получите данные по пользователю `test` и 
 **приведите в ответе к задаче**.
 
+<details>
+<summary> Спойлер с ходом выполнения: </summary>
+
+```
+mysql> CREATE USER 'test'@'localhost'
+    -> IDENTIFIED WITH mysql_native_password BY 'test-pass'
+    -> WITH MAX_CONNECTIONS_PER_HOUR 100
+    -> PASSWORD EXPIRE INTERVAL 180 DAY
+    -> FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2
+    -> ATTRIBUTE '{"first_name":"James", "last_name":"Pretty"}';
+Query OK, 0 rows affected (0.01 sec)
+
+mysql> GRANT SELECT ON test_db.* TO test@localhost;
+Query OK, 0 rows affected, 1 warning (0.00 sec)
+
+mysql> SHOW CREATE USER test@localhost;
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CREATE USER for test@localhost                                                                                                                                                                                                                                                                                                                                                                                         |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| CREATE USER `test`@`localhost` IDENTIFIED WITH 'mysql_native_password' AS '*62C4834A52EB88A9E3EBA2EFF227C58AD0248317' REQUIRE NONE WITH MAX_CONNECTIONS_PER_HOUR 100 PASSWORD EXPIRE INTERVAL 180 DAY ACCOUNT UNLOCK PASSWORD HISTORY DEFAULT PASSWORD REUSE INTERVAL DEFAULT PASSWORD REQUIRE CURRENT DEFAULT FAILED_LOGIN_ATTEMPTS 3 PASSWORD_LOCK_TIME 2 ATTRIBUTE '{"last_name": "Pretty", "first_name": "James"}' |
++------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+1 row in set (0.00 sec)
+```
+
+</details>
+
+```
+mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
++------+-----------+------------------------------------------------+
+| USER | HOST      | ATTRIBUTE                                      |
++------+-----------+------------------------------------------------+
+| test | localhost | {"last_name": "Pretty", "first_name": "James"} |
++------+-----------+------------------------------------------------+
+```
+
+
 ## Задача 3
 
 Установите профилирование `SET profiling = 1`.
