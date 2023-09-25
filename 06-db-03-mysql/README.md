@@ -53,8 +53,10 @@ volumes:
 
 **Приведите в ответе** количество записей с `price` > 300.
 
+> одна запись
+
 <details>
-<summary>одна запись (спойлер с выводом)</summary>
+<summary>спойлер с выводом</summary>
 
 ```
 mysql> SELECT id, title, price FROM orders WHERE price IN (> 300);
