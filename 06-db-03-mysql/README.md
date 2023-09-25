@@ -141,8 +141,10 @@ mysql> SELECT * FROM INFORMATION_SCHEMA.USER_ATTRIBUTES WHERE USER = 'test';
 
 Исследуйте, какой `engine` используется в таблице БД `test_db` и **приведите в ответе**.
 
+> ENGINE=InnoDB
+
 <details>
-<summary>ENGINE=InnoDB (спойлер с выводом)</summary>
+<summary>спойлер с выводом</summary>
 
 ```
 mysql> SHOW CREATE TABLE orders\G;
