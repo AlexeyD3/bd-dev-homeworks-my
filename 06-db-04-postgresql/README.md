@@ -157,7 +157,7 @@ ALTER TABLE orders_more_499 ADD PRIMARY KEY (id);
 > Добавить UNIQUE
 
 ```
-CREATE TABLE public.orders2 (
+CREATE TABLE public.orders (
     id integer NOT NULL,
     title character varying(80) UNIQUE NOT NULL,
     price integer DEFAULT 0
