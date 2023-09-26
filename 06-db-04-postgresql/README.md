@@ -14,7 +14,7 @@
 > \l[+]   [PATTERN]      list databases
 - подключения к БД,
 > Connection
-> \c[onnect] {[DBNAME|- USER|- HOST|- PORT|-] | conninfo}
+> \c[onnect] {[DBNAME|- USER|- HOST|- PORT|-] | conninfo}  
 >                        connect to new database (currently "postgres")  
 > \conninfo              display information about current connection  
 > \encoding [ENCODING]   show or set client encoding  
