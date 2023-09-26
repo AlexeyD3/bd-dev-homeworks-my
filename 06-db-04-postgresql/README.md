@@ -154,6 +154,16 @@ ALTER TABLE orders_more_499 ADD PRIMARY KEY (id);
 
 Как бы вы доработали бэкап-файл, чтобы добавить уникальность значения столбца `title` для таблиц `test_database`?
 
+> Добавить UNIQUE
+
+```
+CREATE TABLE public.orders2 (
+    id integer NOT NULL,
+    title character varying(80) UNIQUE NOT NULL,
+    price integer DEFAULT 0
+);
+```
+
 ---
 
 ### Как cдавать задание
