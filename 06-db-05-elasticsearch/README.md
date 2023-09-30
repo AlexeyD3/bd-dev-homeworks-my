@@ -146,13 +146,115 @@ ed871c0cad7f0e3b74691eece511a8cf655965535843842469c0d349bd50ec98
 | ind-2 | 1 | 2 |
 | ind-3 | 2 | 4 |
 
+```
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X PUT "localhost:9200/ind-1?pretty" -H 'Content-Type: application/json' -d' { "settings": { "number_of_shards": 1, "number_of_replicas": 0 }}'
+
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X PUT localhost:9200/ind-2 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 2,  "number_of_replicas": 1 }}'
+
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X PUT localhost:9200/ind-3 -H 'Content-Type: application/json' -d'{ "settings": { "number_of_shards": 4,  "number_of_replicas": 2 }}'
+
+```
+
 Получите список индексов и их статусов, используя API, и **приведите в ответе** на задание.
+
+```
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X GET 'http://localhost:9200/_cat/indices?v'
+health status index uuid                   pri rep docs.count docs.deleted store.size pri.store.size
+green  open   ind-1 FMxvoKXiTm2BrLWfWtpRcg   1   0          0            0       248b           248b
+yellow open   ind-3 z36-8Pf3QuuxxM3MS8-PPg   4   2          0            0       992b           992b
+yellow open   ind-2 SBTO1sJPT1yD0YeHX1pjIw   2   1          0            0       496b           496b
+```
 
 Получите состояние кластера `Elasticsearch`, используя API.
 
+```
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X GET "localhost:9200/_cluster/health?pretty"
+{
+  "cluster_name" : "netology",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 7,
+  "active_shards" : 7,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 10,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 41.17647058823529
+}
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X GET 'http://localhost:9200/_cluster/health/ind-1?pretty'
+{
+  "cluster_name" : "netology",
+  "status" : "green",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 1,
+  "active_shards" : 1,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 0,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 100.0
+}
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X GET 'http://localhost:9200/_cluster/health/ind-2?pretty'
+{
+  "cluster_name" : "netology",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 2,
+  "active_shards" : 2,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 2,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 50.0
+}
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X GET 'http://localhost:9200/_cluster/health/ind-3?pretty'
+{
+  "cluster_name" : "netology",
+  "status" : "yellow",
+  "timed_out" : false,
+  "number_of_nodes" : 1,
+  "number_of_data_nodes" : 1,
+  "active_primary_shards" : 4,
+  "active_shards" : 4,
+  "relocating_shards" : 0,
+  "initializing_shards" : 0,
+  "unassigned_shards" : 8,
+  "delayed_unassigned_shards" : 0,
+  "number_of_pending_tasks" : 0,
+  "number_of_in_flight_fetch" : 0,
+  "task_max_waiting_in_queue_millis" : 0,
+  "active_shards_percent_as_number" : 33.33333333333333
+}
+
+```
+
 Как вы думаете, почему часть индексов и кластер находятся в состоянии yellow?
 
+> мы указали количество реплик, но имеем в кластере только одну ноду, из-за этого по двум индексам у нас появились нераспределенные шарды "unassigned_shards" и уменьшился процент активных шардов "active_shards_percent_as_number"
+
 Удалите все индексы.
+
+```
+[elasticsearch@027d00f391c1 elasticsearch-8.10.2]$ curl -X DELETE "localhost:9200/ind-1,ind-2,ind-3?pretty"
+{
+  "acknowledged" : true
+}
+```
 
 **Важно**
 
